@@ -21,6 +21,7 @@ public class Apple : MonoBehaviour
     IEnumerator LifeApple()
     {
         yield return new WaitForSeconds(lifeTime);
+        gameObject.GetComponent<SphereCollider>().enabled = false;
         gameObject.GetComponent<Animator>().SetTrigger("IsEat");
         Destroy(this.transform.parent.gameObject, 2f);
     }

@@ -12,11 +12,11 @@ public class GameManager : MonoBehaviour
             return instance;
         }
     }
-    [SerializeField]
-    private Transform player;
+    public Transform player;
     [SerializeField]
     private GameObject[] apples;
     public int score;
+    public List<GameObject> tails;
 
     private void Awake() 
     {
@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        List<GameObject> tails = new List<GameObject>();
         score = 0;
         InvokeRepeating("CreateApple", 2f, 3f);
     }

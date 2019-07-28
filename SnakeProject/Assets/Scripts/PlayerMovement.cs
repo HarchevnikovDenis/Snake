@@ -10,8 +10,8 @@ public class PlayerMovement : MonoBehaviour
     public Transform up;
     public Transform right;
     public Transform down;
-    public List<GameObject> tail;
-    public GameObject tailPrefab;
+    [SerializeField]
+    private GameObject tailPrefab;
     
     // Start is called before the first frame update
     void Start()
@@ -61,11 +61,34 @@ public class PlayerMovement : MonoBehaviour
     {
         if(other.gameObject.tag == "Apple")                                 //Змейка съела яблоко
         {
+            StopCoroutine("AddTail");
             other.gameObject.GetComponent<SphereCollider>().enabled = false;
             other.gameObject.GetComponent<Animator>().SetTrigger("IsEat");
             Destroy(other.gameObject.transform.parent.gameObject, 2f);
             GameManager.Instance.score += 1;
-            Debug.Log(GameManager.Instance.score);
+            //Debug.Log(GameManager.Instance.score);
+            StartCoroutine("AddTail");
         }
+    }
+
+    IEnumerator AddTail()
+    {
+        Vector3 firstPos = Vector3.zero;
+        Quaternion rot = Quaternion.identity;
+        if(GameManager.Instance.tails.Count == 0)
+        {
+            firstPos = this.transform.position;
+            rot = this.transform.rotation;
+        }
+        else
+        {
+            firstPos = GameManager.Instance.tails[GameManager.Instance.tails.Count - 1].transform.position;
+            rot = GameManager.Instance.tails[GameManager.Instance.tails.Count - 1].transform.rotation;
+        }
+        Vector3 createPos = new Vector3(firstPos.x, 0.5f, firstPos.z);
+        yield return new WaitForSeconds(0.2f);
+        GameObject tail = Instantiate(tailPrefab, createPos, rot) as GameObject;
+        GameManager.Instance.tails.Add(tail);
+        Debug.Log(GameManager.Instance.tails.Count);
     }
 }
