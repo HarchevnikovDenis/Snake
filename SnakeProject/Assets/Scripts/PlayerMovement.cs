@@ -10,6 +10,8 @@ public class PlayerMovement : MonoBehaviour
     public Transform up;
     public Transform right;
     public Transform down;
+    public List<GameObject> tail;
+    public GameObject tailPrefab;
     
     // Start is called before the first frame update
     void Start()
@@ -52,6 +54,18 @@ public class PlayerMovement : MonoBehaviour
                 Quaternion rotation = Quaternion.LookRotation(direction);
                 transform.rotation = Quaternion.Lerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime);
             }
+        }
+    }
+
+    private void OnCollisionEnter(Collision other) 
+    {
+        if(other.gameObject.tag == "Apple")                                 //Змейка съела яблоко
+        {
+            other.gameObject.GetComponent<SphereCollider>().enabled = false;
+            other.gameObject.GetComponent<Animator>().SetTrigger("IsEat");
+            Destroy(other.gameObject.transform.parent.gameObject, 2f);
+            GameManager.Instance.score += 1;
+            Debug.Log(GameManager.Instance.score);
         }
     }
 }

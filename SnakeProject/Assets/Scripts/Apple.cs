@@ -24,15 +24,4 @@ public class Apple : MonoBehaviour
         gameObject.GetComponent<Animator>().SetTrigger("IsEat");
         Destroy(this.transform.parent.gameObject, 2f);
     }
-
-    private void OnTriggerEnter(Collider other) 
-    {
-        if(other.gameObject.tag == "Player")                                 //Змейка съела яблоко
-        {
-            gameObject.GetComponent<Animator>().SetTrigger("IsEat");
-            Destroy(gameObject.transform.parent.gameObject, 2f);
-            GameManager.Instance.score += 1;
-            Debug.Log(GameManager.Instance.score);
-        }
-    }
 }
