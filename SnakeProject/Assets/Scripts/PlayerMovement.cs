@@ -12,6 +12,7 @@ public class PlayerMovement : MonoBehaviour
     public Transform down;
     [SerializeField]
     private GameObject tailPrefab;
+    private bool canJump;
     
     // Start is called before the first frame update
     void Start()
@@ -24,9 +25,9 @@ public class PlayerMovement : MonoBehaviour
     {
         transform.Translate(Vector3.forward * speed * Time.deltaTime);          //  Постоянное движение змейки вперед
 
-        if(Input.GetAxis("Horizontal") != 0)                                    //  Проверка нажатий A/D
+        if(Input.GetAxis("Horizontal") != 0f)                                    //  Проверка нажатий A/D
         {
-            if(Input.GetAxis("Horizontal") < 0)
+            if(Input.GetAxis("Horizontal") < 0f)
             {
                 Vector3 direction = left.position - this.transform.position;
                 Quaternion rotation = Quaternion.LookRotation(direction);
@@ -40,9 +41,9 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        if(Input.GetAxis("Vertical") != 0)                                    //  Проверка нажатий W/S
+        if(Input.GetAxis("Vertical") != 0f)                                    //  Проверка нажатий W/S
         {
-            if(Input.GetAxis("Vertical") < 0)
+            if(Input.GetAxis("Vertical") < 0f)
             {
                 Vector3 direction = down.position - this.transform.position;
                 Quaternion rotation = Quaternion.LookRotation(direction);
@@ -55,6 +56,11 @@ public class PlayerMovement : MonoBehaviour
                 transform.rotation = Quaternion.Lerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime);
             }
         }
+
+        /*if(Input.GetAxis("Jump") != 0f && canJump)
+        {
+            this.gameObject.GetComponent<Rigidbody>().AddForce(Vector3.up * 4f, ForceMode.Impulse);
+        }*/
     }
 
     private void OnCollisionEnter(Collision other) 
@@ -64,14 +70,14 @@ public class PlayerMovement : MonoBehaviour
             StopCoroutine("AddTail");
             other.gameObject.GetComponent<SphereCollider>().enabled = false;
             other.gameObject.GetComponent<Animator>().SetTrigger("IsEat");
+            Material Mat = other.gameObject.GetComponent<MeshRenderer>().material;
             Destroy(other.gameObject.transform.parent.gameObject, 2f);
-            GameManager.Instance.score += 1;
-            //Debug.Log(GameManager.Instance.score);
-            StartCoroutine("AddTail");
+            GameManager.Instance.score = GameManager.Instance.tails.Count;
+            StartCoroutine("AddTail", Mat);
         }
     }
 
-    IEnumerator AddTail()
+    IEnumerator AddTail(Material mat)
     {
         Vector3 firstPos = Vector3.zero;
         Quaternion rot = Quaternion.identity;
@@ -88,7 +94,19 @@ public class PlayerMovement : MonoBehaviour
         Vector3 createPos = new Vector3(firstPos.x, 0.5f, firstPos.z);
         yield return new WaitForSeconds(0.2f);
         GameObject tail = Instantiate(tailPrefab, createPos, rot) as GameObject;
+        tail.transform.GetChild(0).GetComponent<MeshRenderer>().material = mat;
         GameManager.Instance.tails.Add(tail);
         Debug.Log(GameManager.Instance.tails.Count);
+    }
+
+
+    private void OnTriggerEnter(Collider other) {
+        if(other.gameObject.tag == "Ground")
+            canJump = true;
+    }
+
+    private void OnTriggerExit(Collider other) {
+        if(other.gameObject.tag == "Ground")
+            canJump = false;
     }
 }

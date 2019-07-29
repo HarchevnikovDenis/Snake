@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
     {
         List<GameObject> tails = new List<GameObject>();
         score = 0;
-        InvokeRepeating("CreateApple", 2f, 3f);
+        InvokeRepeating("CreateApple", 1.5f, 2f);
     }
 
     // Update is called once per frame
